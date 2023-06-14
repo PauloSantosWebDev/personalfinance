@@ -1,0 +1,14 @@
+{
+  "name": "personalfinances",
+  "version": "1.0.0",
+  "description": "Web app focused on helping people have a better control over their finances",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Paulo Santos",
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.18.2"
+  }
+}

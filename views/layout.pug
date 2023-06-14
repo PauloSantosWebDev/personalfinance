@@ -1,0 +1,35 @@
+doctype html
+html(lang="en")
+head
+  meta(charset="UTF-8")
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  title= title
+  block styles
+    style
+      include ../public/stylesheets/style.css
+  block scripts
+
+body
+  header
+    nav.navbar 
+      div
+        button#btn-books(type="button") Books
+        a.books-dropdown-links(href="") Income
+        a.books-dropdown-links(href="") Expenses
+        a.books-dropdown-links(href="") Investments 
+        a.books-dropdown-links(href="") Extraordinary payments
+        a.books-dropdown-links(href="") Debts
+        a.books-dropdown-links(href="") Credits
+      
+      div
+        button(type="button") Plan
+        a(href="") Financial goals
+        a(href="") Budget
+      
+      div
+        button(type=("button")) Cashflow
+    
+  main
+    block content
+  footer
+

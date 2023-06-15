@@ -6,28 +6,106 @@
 
 .navbar div {
   display: inline-grid;
-  grid-template-columns: auto auto auto;
-  gap: 10px;
+  grid-template-columns: auto;
+  gap: 1em;
+  column-gap: 10em;
+  margin: 10px;
+  width: 30%;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.navbar {
+  background-color: grey;
+  height: fit-content;
+}
+
+.dropdown-books {
+  max-width: 13em;
+  margin: 80px auto 0;
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-btn-books {
+  background: #1d1f24;
+  font-size: 18px;
+  width: 100%;
+  border: none;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7em 0.5em;
+  border-radius: 0.5em;
+  cursor: pointer;
+}
+
+.btn {
+  background: #1d1f24;
+  font-size: 18px;
+  width: 100%;
+  border: none;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7em 0.5em;
+  border-radius: 0.5em;
+  cursor: pointer;
+}
+
+.arrow {
+  border-left: 5px solid transparent;
+  border-right:5px solid transparent;
+  border-top: 6px solid #fff;
+  transition: transform ease-in-out 0.3s;
+}
+
+.dropdown-content-books {
+  list-style: none;
+  position: absolute;
+  top: 3.2em;
+  width: 100%;
+  visibility: hidden;
+}
+
+.dropdown-content-books li:hover {
+  background: #1d1f24;
+}
+
+.dropdown-content-books li a {
+  display: block;
+  padding: 0.7em 0.5em;
+  color: black;
+  margin: 0.1em 0;
+  text-decoration: none;
+}
+
+.dropdown-btn-books:focus + .dropdown-content-books {
+  visibility: visible;
+}
+
+.dropdown-btn-books:focus .arrow {
+  transform: rotate(180deg);
+}
+
+a {
+  display: none;
 }
 
 /* a {
   display: none;
-} */
-
-a {
-  display: none;
-  /* position: absolute;
+  position: absolute;
   background-color: #f9f9f9;
   min-width: 15px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   padding: 12px 16px;
-  z-index: 1; */
+  z-index: 1;
 }
 
-#btn-books:hover a{
+.btn-books:hover a {
   display: block;
-}
+  background-color: black;
+} */
 
-body {
-  background-color: grey;
-}

@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname,'public')));
 
 //Creating routes
 app.get("/", (req, res) =>{
-    res.render('index', {title: 'Is it working?'});
+    res.render('index', {title: 'Home page'});
 })
 
 const server = http.createServer(app);

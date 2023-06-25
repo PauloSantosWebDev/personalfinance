@@ -1,0 +1,50 @@
+{% extends 'layout.njk' %}
+
+{% block content %}
+  <h2>Create a new category</h2>
+  <form class="row g-3" method="post" action="/categories">
+    <div class="col-md-2">
+      <label for="inputAllocations" class="form-label">Allocations</label>
+      <select id="inputAllocations" name="inputAllocations" class="form-select">
+        <option selected>Choose...</option>
+        <option>Credits</option>
+        <option>Debts</option>
+        <option>Expenses</option>
+        <option>Extraordinary payments</option>
+        <option>Income</option>
+        <option>Investments</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="inputNewCategory" class="form-label">New category</label>
+      <input type="text" class="form-control" id="inputNewCategory" name="inputNewCategory">
+    </div>
+    <div class="col-md-4">
+      <label for="inputDescription" class="form-label">Description</label>
+      <input type="text" class="form-control" id="inputDescription" name="inputDescription">
+    </div>
+    <div class="col-4">
+      <button type="submit" class="btn btn-primary" style="margin-top: 7.5%;">Register</button>
+    </div>
+  </form>
+  <hr>
+  <h2>Current categories</h2>
+  <table>
+    <tr>
+      <th>Allocation</th>
+      <th>Category</th>
+      <th>Description</th>
+    </tr>
+    {% for l in lines %}
+      <tr>
+        <td>{{l.allocation}}</td>
+        <td>{{l.category}}</td>
+        <td>{{l.description}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <div class="container" id="js-generate-income-category-table">
+    
+  </div>
+{% endblock %}

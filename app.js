@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname,'public')));
 //Middleware to parse request body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
 //Creating routes
 //Get methods
@@ -33,37 +34,40 @@ app.get("/", (req, res) =>{
     res.render('index', {title: 'Home page'});
 })
 
-app.get("/categincome", (req, res) =>{
-    res.render('categincome.njk', {title: 'New income category'});
+app.get("/categories", (req, res) =>{
+    db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
+    
+    if (err) {
+        throw err;
+    }
+
+    const lines = rows.map(row => ({allocation: row.allocation, category: row.category, description: row.description}));
+
+    res.render('categories.njk', {title: 'Categories page', lines});
+    })
+
+    // res.render('categories.njk', {title: 'Categories page'});
 })
 
 //Post methods
-app.post('/categincome', (req, res) =>{
-    const incomeCategory = req.body.inputIncomeCategory;
-    const description = req.body.inputIncomeCategoryDescription;
+app.post('/categories', (req, res) =>{
+    const allocation = req.body.inputAllocations;
+    const category = req.body.inputNewCategory;
+    const description = req.body.inputDescription;
 
-    console.log('My income category is: ' + incomeCategory);
+    console.log('My category is: ' + category);
 
-    //Command to insert new customes to the customers table in the hydroil.sqlite database
-    db.run('INSERT INTO income_categories (category, description) VALUES (?, ?)', [incomeCategory, description], (err) => {
+    //Inserting data to the table
+    db.run('INSERT INTO categories (allocation, category, description) VALUES (?, ?, ?)', [allocation, category, description], (err) => {
         if (err) {
         console.error(err.message);
-        res.status(500).send('Error updating data in customer table.');
+        res.status(500).send('Error updating data in categories table.');
         } else {
         res.status(200);
-        console.log('Data updated successfully in customers table.');
-        res.redirect('/categincome');
+        console.log('Data updated successfully in categories table.');
+        res.redirect('/categories');
         }
     });
-
-    db.all('SELECT * FROM income_categories', (err, rows) => {
-        if (err) {
-            throw err;
-        }
-        rows.forEach(row => {
-            console.log(row.category_id, row.category, row.description);
-        })
-    })
 })
 
 //Server listening

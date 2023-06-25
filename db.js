@@ -9,8 +9,8 @@ let db = new sqlite3.Database("personalfinances.sqlite", (err) => {
 })
 
 //Creating the tables needed if needed.
-//Income categories table
-db.run('CREATE TABLE IF NOT EXISTS income_categories (category_id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT NOT NULL, description TEXT)');
+//Categories table
+db.run('CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY AUTOINCREMENT, allocation TEXT NOT NULL, category TEXT NOT NULL, description TEXT)');
 
 //Example of how to create a table with a foreign key
 // db.run('CREATE TABLE IF NOT EXISTS contacts (customer_id INTEGER NOT NULL, contact_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, phone_number TEXT, mobile_number TEXT, FOREIGN KEY (customer_id) REFERENCES customers(customer_id))');

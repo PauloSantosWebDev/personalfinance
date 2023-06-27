@@ -1,8 +1,7 @@
 //Functions
 
+//Function that use the fetch() method to delete a category line in the database. 
 async function deleteLine (value) {
-  // const item = document.getElementById('js-input-customer-supplier').value;
-  console.log('The value is: ' + value);
   const options = {
     method: 'post',
     headers: {
@@ -10,15 +9,10 @@ async function deleteLine (value) {
     },
     body: JSON.stringify({value})
   };
-
   const response = await fetch('/categories', options);
-  // console.log('The response is:' + JSON.stringify(response));
-  
   const data = await response.json();
   console.log(data);
-
-  return;
-  // return data.body;
+  return data;
 };
 
 //End of functions
@@ -37,8 +31,10 @@ async function deleteLine (value) {
 //Listening to delete calls
 document.querySelectorAll('.js-btn-delete').forEach((e, i) => {
   e.addEventListener('click', async () => {
-    console.log('value is: ' + e.value);
-    await deleteLine(e.value);
+    const del = await deleteLine(e.value);    
+    if (del['status'] === 'success') {
+      location.reload();
+    }
   })
 })
 //End of listeners

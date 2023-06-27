@@ -98,42 +98,7 @@ app.post('/categories', (req, res) =>{
       }
     });
   }
-    // console.log(req.body);
-    // console.log(req.body.value);
-    // res.json({
-    //     status: 'success'
-    // });
-    // res.end();
 })
-
-// //Delete methods
-// app.delete("/categories", (req, res) =>{
-
-//     const data = req.body.value;
-//     console.log('Data is: ' + data);
-
-//     //Inserting data to the table
-//     db.run('DELETE FROM categories WHERE category_id = ?', [data], (err) => {
-//         if (err) {
-//             console.error(err.message);
-//             res.status(500).send('Error updating data in categories table.');
-//         } else {
-//             res.status(200);
-//             console.log('Data deleted from categories table.');
-//         }
-//     });
-
-//     res.redirect('/categories');
-    
-//     // let data = JSON.stringify(req.body);
-//     // data = JSON.parse(data);
-//     // let value = data.value;
-//     // console.log('My request is: ' + JSON.stringify(req.body));
-//     // console.log('My data is: ' + data);
-//     // console.log('My data is: ' + value);
-//     // res.end();
-// })
-
 
 //Server listening
 const server = http.createServer(app);

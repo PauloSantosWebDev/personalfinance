@@ -32,6 +32,15 @@ app.use(express.json());
 // db.run('DROP TABLE credits');
 // db.run('DROP TABLE payments_received');
 // db.run('DROP TABLE interests_received');
+db.all('SELECT * FROM payments_received', (err, rows) => {
+  if (err) {
+    throw err;
+  }
+  rows.forEach(row => {
+    console.log(row);
+  })
+})
+
 db.all('SELECT * FROM credits', (err, rows) => {
   if (err) {
     throw err;
@@ -78,6 +87,17 @@ app.get('/newcredits', (req, res) => {
   })
 })
 
+app.get('/paymentreceived', (req, res) => {
+  db.all('SELECT * FROM credits', (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
+    res.render('paymentreceived.njk', {title: 'Payments received', lines});
+  })
+  
+})
+
 //------------------------------------------------------------------
 //Post methods
 //Post for the categories page
@@ -121,6 +141,7 @@ app.post('/categories', (req, res) =>{
   }
 })
 
+//Post method to populate credits table
 app.post('/newcredits', (req, res) => {
   const categ = req.body.inputCategory;
   const date = req.body.inputDateCreated;
@@ -141,6 +162,53 @@ app.post('/newcredits', (req, res) => {
       }
   });
 })
+
+//Post method to populate payments_received table and update credits table
+app.post('/paymentreceived', (req, res) => {
+  const debtor = req.body.inputDebtor;
+  const dateCreated = req.body.inputDateCreated;
+  const initAmount = req.body.inputInitialAmount;
+  const date = req.body.inputPaymentDate;
+  const payment = req.body.inputPayment;
+  const details = req.body.inputDescription;
+
+  db.get('SELECT credit_id, current_amount FROM credits WHERE debtor = ? AND date = ? AND initial_amount = ?', [debtor, dateCreated, initAmount], (err, row) => {
+
+    if (err) {
+      throw err;
+    }
+
+    const credit_id = row.credit_id;
+    const current = row.current_amount;
+    const remaining = current - payment;
+
+    db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [credit_id, date, payment, debtor, details], (err) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send('Error updating data in payments_received table.');
+        } else {
+        res.status(200);
+        console.log('Data updated successfully in payments_received table.');
+        // res.redirect('/paymentreceived');
+        }
+    })
+
+    db.run('UPDATE credits SET current_amount = ?',[remaining], (err) =>{
+      if (err) {
+        console.error(err.message);
+        res.status(500).send('Error updating current_amount in credits table.');
+        } else {
+        res.status(200);
+        console.log('current_amount updated successfully in credits table.');
+        res.redirect('/paymentreceived');
+        }
+    })
+  })
+})
+
+
+
+
 //Server listening
 const server = http.createServer(app);
 server.listen('3000', (err, html) => {

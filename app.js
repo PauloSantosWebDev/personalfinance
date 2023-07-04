@@ -4,6 +4,7 @@ const http = require('http');
 const path = require('path');
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -32,32 +33,43 @@ app.use(express.json());
 // db.run('DROP TABLE credits');
 // db.run('DROP TABLE payments_received');
 // db.run('DROP TABLE interests_received');
-db.all('SELECT * FROM payments_received', (err, rows) => {
-  if (err) {
-    throw err;
-  }
-  rows.forEach(row => {
-    console.log(row);
-  })
-})
+// db.all('SELECT * FROM payments_received', (err, rows) => {
+//   if (err) {
+//     throw err;
+//   }
+//   rows.forEach(row => {
+//     console.log(row);
+//   })
+// })
 
-db.all('SELECT * FROM credits', (err, rows) => {
-  if (err) {
-    throw err;
-  }
-  rows.forEach(row => {
-    console.log(row);
-  })
-})
+// db.all('SELECT * FROM credits', (err, rows) => {
+//   if (err) {
+//     throw err;
+//   }
+//   rows.forEach(row => {
+//     console.log(row);
+//   })
+// })
 
 //Creating routes
 //Get methods
-app.get("/", (req, res) =>{
+
+//Used to get the sign in page
+app.get("/signin", (req, res) => {
+  res.render('signin.njk', {title: 'Sign in page'});
+})
+
+//Used do get the registration page
+app.get('/register', (req, res) => {
+  res.render('register.njk', {title: 'Registration page'});
+})
+
+app.get("/", (req, res) => {
     res.render('index', {title: 'Home page'});
 })
 
 //Categories page
-app.get("/categories", (req, res) =>{
+app.get("/categories", (req, res) => {
     
     const data = req.body;
     

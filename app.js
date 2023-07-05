@@ -42,14 +42,14 @@ app.use(express.json());
 //   })
 // })
 
-// db.all('SELECT * FROM credits', (err, rows) => {
-//   if (err) {
-//     throw err;
-//   }
-//   rows.forEach(row => {
-//     console.log(row);
-//   })
-// })
+db.all('SELECT * FROM users', (err, rows) => {
+  if (err) {
+    throw err;
+  }
+  rows.forEach(row => {
+    console.log(row);
+  })
+})
 
 //Creating routes
 //Get methods
@@ -218,6 +218,32 @@ app.post('/paymentreceived', (req, res) => {
   })
 })
 
+app.post('/register', async (req, res) => {
+  const user = req.body.inputUserName;
+  const password = req.body.password;
+  const passwordConfirmation = req.body.passwordConfirmation;
+
+  if (user == '' || password == '' || passwordConfirmation == '' || password != passwordConfirmation) {
+    res.render('error.njk', {title: 'Error page', errorMessage: 'User not registered! Please make sure data is not changed in the client side.', refLink: '/signin'});
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+  
+  db.run('INSERT INTO users (user_name, password) VALUES (?, ?)', [user, hash], (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Error inserting user data in users table.');
+    } 
+    else {
+      res.status(200);
+      console.log('Data inserted successfully in users table.');
+      res.redirect('/signin');
+    }
+  })
+
+
+  // res.render("register.njk");
+})
 
 
 

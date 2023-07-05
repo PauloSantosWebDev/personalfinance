@@ -5,33 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/style.css" rel="stylesheet">
+    <title>{{title}}</title>
   </head>
   <body>
     <div class="d-flex align-items-center justify-content-center">
       <div class="container">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
           <div class="container-fluid mx-auto">
-            <h2 class="display-5 text-muted">Please, sign in!</h2>        
+            <h2 class="display-5 text-muted">Sign up page!</h2>        
           </div>
         </nav>
         <div class="container">
-          <form>
+          <form method="post" action="/register">
             <div class="mb-3">
               <label for="inputUserName" class="form-label">User name</label>
-              <input type="text" class="form-control w-25 p-3" id="inputUserName">
+              <input type="text" class="form-control w-25 p-3 js-check" id="inputUserName" name="inputUserName">
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control w-25 p-3" id="password">
+              <input type="password" class="form-control w-25 p-3 js-check" id="password" name="password">
             </div>
             <div class="mb-3">
               <label for="passwordConfirmation" class="form-label">Confirm Password</label>
-              <input type="password" class="form-control w-25 p-3" id="passwordConfirmation">
+              <input type="password" class="form-control w-25 p-3 js-check" id="passwordConfirmation" name="passwordConfirmation">
             </div>
-            <button type="submit" class="btn btn-secondary">Register</button>
+            {# <button type="submit" class="btn btn-secondary" id="js-btn-sign-up">Sign up</button> #}
           </form>
+          <button type="button" class="btn btn-secondary" id="js-btn-sign-up">Sign up</button>
         </div>
       </div>
     </div>
+    <script src="/javascripts/register.js"></script>
   </body>
 </html>

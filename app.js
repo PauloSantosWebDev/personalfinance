@@ -70,21 +70,16 @@ app.get("/", (req, res) => {
 
 //Categories page
 app.get("/categories", (req, res) => {
-    
-    const data = req.body;
-    
-    db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
-    
-    if (err) {
-        throw err;
-    }
+  db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
+  
+  if (err) {
+      throw err;
+  }
 
-    const lines = rows.map(row => ({id: row.category_id, allocation: row.allocation, category: row.category, description: row.description}));
+  const lines = rows.map(row => ({id: row.category_id, allocation: row.allocation, category: row.category, description: row.description}));
 
-    res.render('categories.njk', {title: 'Categories page', lines});
-    })
-
-    // res.render('categories.njk', {title: 'Categories page'});
+  res.render('categories.njk', {title: 'Categories page', lines});
+  })
 })
 
 //New credits page
@@ -99,6 +94,7 @@ app.get('/newcredits', (req, res) => {
   })
 })
 
+//Payment received page
 app.get('/paymentreceived', (req, res) => {
   db.all('SELECT * FROM credits', (err, rows) => {
     if (err) {
@@ -107,7 +103,6 @@ app.get('/paymentreceived', (req, res) => {
     const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
     res.render('paymentreceived.njk', {title: 'Payments received', lines});
   })
-  
 })
 
 //------------------------------------------------------------------
@@ -243,6 +238,29 @@ app.post('/register', async (req, res) => {
 
 
   // res.render("register.njk");
+})
+
+app.post('/signin', (req, res) => {
+
+  const user = req.body.inputUserName;
+  const password = req.body.password;
+
+  db.all('SELECT * FROM users WHERE user_name = ?', [user], async (err, rows) => {
+    if (err) {
+      throw err;
+    }
+
+    const hashedPassword = rows.map(row => ({password: row.password}));
+    // console.log(hashedPassword[0].password);
+
+    const isMatch = await bcrypt.compare(password, hashedPassword[0].password);
+
+    console.log(isMatch);
+
+    if (isMatch) {
+      res.redirect('/');
+    }
+  })
 })
 
 

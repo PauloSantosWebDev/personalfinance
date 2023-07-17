@@ -5,6 +5,7 @@ const path = require('path');
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const sessions = require('express-session');
 
 const app = express();
 const port = 3000;
@@ -28,6 +29,13 @@ app.use(express.static(path.join(__dirname,'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+//Setting up session middleware
+app.use(sessions({
+  secret: 'my-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 86400000 }
+}))
 
 //Used to check the database
 // db.run('DROP TABLE credits');
@@ -64,46 +72,79 @@ app.get('/register', (req, res) => {
   res.render('register.njk', {title: 'Registration page'});
 })
 
+//Used to destroy the users' session and sign them out
+app.get('/signout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.redirect('/signin');
+    }
+  });
+})
+
 app.get("/", (req, res) => {
+  if (req.session.user_id) { 
     res.render('index', {title: 'Home page'});
+  }
+  else {
+    res.redirect('/signin');
+  }
 })
 
 //Categories page
 app.get("/categories", (req, res) => {
-  db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
+  if (req.session.user_id) {
+    db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
   
-  if (err) {
-      throw err;
+      if (err) {
+          throw err;
+      }
+    
+      const lines = rows.map(row => ({id: row.category_id, allocation: row.allocation, category: row.category, description: row.description}));
+    
+      res.render('categories.njk', {title: 'Categories page', lines});
+      })
+  }
+  else {
+    res.redirect('/signin');
   }
 
-  const lines = rows.map(row => ({id: row.category_id, allocation: row.allocation, category: row.category, description: row.description}));
-
-  res.render('categories.njk', {title: 'Categories page', lines});
-  })
 })
 
 //New credits page
 app.get('/newcredits', (req, res) => {
-  const credit = 'Credits';
-  db.all('SELECT category FROM categories WHERE allocation = ?', [credit], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    const lines = rows.map(row => ({category: row.category}));
-    res.render('newcredits.njk', {title:'New credits page', lines});
-  })
+  if (req.session.user_id) {
+    const credit = 'Credits';
+    db.all('SELECT category FROM categories WHERE allocation = ?', [credit], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const lines = rows.map(row => ({category: row.category}));
+      res.render('newcredits.njk', {title:'New credits page', lines});
+    })
+  } 
+  else {
+    res.redirect('/signin');
+  }
 })
 
 //Payment received page
 app.get('/paymentreceived', (req, res) => {
-  db.all('SELECT * FROM credits', (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
-    res.render('paymentreceived.njk', {title: 'Payments received', lines});
-  })
+  if (req.session.user_id) {
+    db.all('SELECT * FROM credits', (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
+      res.render('paymentreceived.njk', {title: 'Payments received', lines});
+    })
+  }
+  else {
+    res.redirect('/signin');
+  }
 })
+
 
 //------------------------------------------------------------------
 //Post methods
@@ -250,7 +291,7 @@ app.post('/signin', (req, res) => {
       throw err;
     }
 
-    const hashedPassword = rows.map(row => ({password: row.password}));
+    const hashedPassword = rows.map(row => ({id: row.user_id, password: row.password}));
     // console.log(hashedPassword[0].password);
 
     const isMatch = await bcrypt.compare(password, hashedPassword[0].password);
@@ -258,7 +299,11 @@ app.post('/signin', (req, res) => {
     console.log(isMatch);
 
     if (isMatch) {
+      req.session.user_id = hashedPassword[0].id;
       res.redirect('/');
+    } 
+    else {
+      res.send('Invalid username or password');
     }
   })
 })

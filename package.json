@@ -17,6 +17,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "bootstrap-icons": "^1.10.5",
+    "express-session": "^1.17.3",
     "nunjucks": "^3.2.4"
   }
 }

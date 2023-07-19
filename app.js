@@ -50,7 +50,7 @@ app.use(sessions({
 //   })
 // })
 
-db.all('SELECT * FROM users', (err, rows) => {
+db.all('SELECT * FROM credits', (err, rows) => {
   if (err) {
     throw err;
   }
@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
 //Categories page
 app.get("/categories", (req, res) => {
   if (req.session.user_id) {
-    db.all('SELECT * FROM categories ORDER BY allocation, category', (err, rows) => {
+    db.all('SELECT * FROM categories WHERE user_id = ? ORDER BY allocation, category', [req.session.user_id], (err, rows) => {
   
       if (err) {
           throw err;
@@ -116,12 +116,19 @@ app.get("/categories", (req, res) => {
 app.get('/newcredits', (req, res) => {
   if (req.session.user_id) {
     const credit = 'Credits';
-    db.all('SELECT category FROM categories WHERE allocation = ?', [credit], (err, rows) => {
+    db.all('SELECT category FROM categories WHERE allocation = ? AND user_id = ?', [credit, req.session.user_id], (err, rows) => {
       if (err) {
         throw err;
       }
       const lines = rows.map(row => ({category: row.category}));
-      res.render('newcredits.njk', {title:'New credits page', lines});
+      db.all('SELECT * from credits WHERE user_id =?', [req.session.user_id], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        const creditLines = rows.map(row => ({category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
+        res.render('newcredits.njk', {title:'New credits page', lines, creditLines});
+      })
+      // res.render('newcredits.njk', {title:'New credits page', lines});
     })
   } 
   else {
@@ -132,7 +139,7 @@ app.get('/newcredits', (req, res) => {
 //Payment received page
 app.get('/paymentreceived', (req, res) => {
   if (req.session.user_id) {
-    db.all('SELECT * FROM credits', (err, rows) => {
+    db.all('SELECT * FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
       if (err) {
         throw err;
       }
@@ -160,7 +167,7 @@ app.post('/categories', (req, res) =>{
     const description = req.body.inputDescription;
 
     //Inserting data to the table
-    db.run('INSERT INTO categories (allocation, category, description) VALUES (?, ?, ?)', [allocation, category, description], (err) => {
+    db.run('INSERT INTO categories (user_id, allocation, category, description) VALUES (?, ?, ?, ?)', [req.session.user_id, allocation, category, description], (err) => {
       if (err) {
       console.error(err.message);
       res.status(500).send('Error updating data in categories table.');
@@ -199,7 +206,7 @@ app.post('/newcredits', (req, res) => {
 
   console.log(req.body);
 
-  db.run('INSERT INTO credits (category, date, initial_amount, debtor, description, current_amount) VALUES (?, ?, ?, ?, ?, ?)', [categ, date, amount, debtor, description, amount], (err) => {
+  db.run('INSERT INTO credits (user_id, category, date, initial_amount, debtor, description, current_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', [req.session.user_id, categ, date, amount, debtor, description, amount], (err) => {
     if (err) {
       console.error(err.message);
       res.status(500).send('Error updating data in credits table.');
@@ -254,6 +261,7 @@ app.post('/paymentreceived', (req, res) => {
   })
 })
 
+//Post method used to sign up users
 app.post('/register', async (req, res) => {
   const user = req.body.inputUserName;
   const password = req.body.password;
@@ -281,6 +289,7 @@ app.post('/register', async (req, res) => {
   // res.render("register.njk");
 })
 
+//Post method used to sign in users
 app.post('/signin', (req, res) => {
 
   const user = req.body.inputUserName;

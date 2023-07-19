@@ -33,4 +33,35 @@
       <button type="submit" class="btn btn-success">Register</button>
     </div>
   </form>
+
+  <h5 style="margin-top: 2em; margin-bottom: 1em;">CREDITS TABLE</h5>
+
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">Category</th>
+        <th scope="col" class="text-center">Date</th>
+        <th scope="col" class="text-center">Initial Amount</th>
+        <th scope="col" class="text-center">Current Amount</th>
+        <th scope="col" class="text-center">Debtor's name</th>
+        <th scope="col" class="text-center">Description</th>
+      </tr>
+    </thead>
+    <tbody id="js-tbl-credits" class="table-group-divider">
+    {% for c in creditLines %}
+      <tr>
+        <td scope="col" class="text-center">1</td>
+        <td scope="col" class="text-center">{{c.category}}</td>
+        <td scope="col" class="text-center">{{c.date}}</td>
+        <td scope="col" class="text-center">{{c.iamount}}</td>
+        <td scope="col" class="text-center">{{c.camount}}</td>
+        <td scope="col" class="text-center">{{c.debtor}}</td>
+        <td scope="col" class="text-center">{{c.description}}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <script src="/javascripts/newcredits.js"></script>
 {% endblock %}

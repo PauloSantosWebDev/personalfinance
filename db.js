@@ -13,10 +13,10 @@ let db = new sqlite3.Database("personalfinances.sqlite", (err) => {
 db.run('CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT NOT NULL, password TEXT NOT NULL)');
 
 //Categories table
-db.run('CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY AUTOINCREMENT, allocation TEXT NOT NULL, category TEXT NOT NULL, description TEXT)');
+db.run('CREATE TABLE IF NOT EXISTS categories (user_id INTEGER, category_id INTEGER PRIMARY KEY AUTOINCREMENT, allocation TEXT NOT NULL, category TEXT NOT NULL, description TEXT, FOREIGN KEY (user_id) REFERENCES users (user_id))');
 
 //credits table. Here new credits acquired will be inserted. Also, the update amount in credit will be stored here.
-db.run('CREATE TABLE IF NOT EXISTS credits (credit_id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, date TEXT NOT NULL, initial_amount REAL NOT NULL, debtor TEXT NOT NULL, description NOT NULL, current_amount REAL)');
+db.run('CREATE TABLE IF NOT EXISTS credits (user_id INTEGER, credit_id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, date TEXT NOT NULL, initial_amount REAL NOT NULL, debtor TEXT NOT NULL, description NOT NULL, current_amount REAL, FOREIGN KEY (user_id) REFERENCES users (user_id))');
 
 //All the payments toward the credits I have will be stored in the payments_received table.
 db.run('CREATE TABLE IF NOT EXISTS payments_received (credit_id INTEGER, date TEXT NOT NULL, amount REAL NOT NULL, payer TEXT NOT NULL, detail TEXT, FOREIGN KEY (credit_id) REFERENCES credits (credit_id))');

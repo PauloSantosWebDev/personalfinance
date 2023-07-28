@@ -49,15 +49,15 @@ app.use(sessions({
 //     console.log(row);
 //   })
 // })
-
-db.all('SELECT * FROM credits', (err, rows) => {
-  if (err) {
-    throw err;
-  }
-  rows.forEach(row => {
-    console.log(row);
-  })
-})
+// 
+// db.all('SELECT * FROM credits', (err, rows) => {
+//   if (err) {
+//     throw err;
+//   }
+//   rows.forEach(row => {
+//     console.log(row);
+//   })
+// })
 
 //Creating routes
 //Get methods
@@ -139,13 +139,20 @@ app.get('/newcredits', (req, res) => {
 //Payment received page
 app.get('/paymentreceived', (req, res) => {
   if (req.session.user_id) {
-    db.all('SELECT * FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
-      if (err) {
-        throw err;
-      }
-      const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
-      res.render('paymentreceived.njk', {title: 'Payments received', lines});
-    })
+    // db.all('SELECT * FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+      // const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
+      db.all('SELECT * from credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        const creditLines = rows.map(row => ({category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
+        res.render('paymentreceived.njk', {title:'Payments received', creditLines});
+      }) 
+      // res.render('paymentreceived.njk', {title: 'Payments received', lines});
+    // })
   }
   else {
     res.redirect('/signin');
@@ -226,39 +233,60 @@ app.post('/paymentreceived', (req, res) => {
   const date = req.body.inputPaymentDate;
   const payment = req.body.inputPayment;
   const details = req.body.inputDescription;
+  const selection = req.body.selection;
 
-  db.get('SELECT credit_id, current_amount FROM credits WHERE debtor = ? AND date = ? AND initial_amount = ?', [debtor, dateCreated, initAmount], (err, row) => {
+  console.log(selection);
 
-    if (err) {
-      throw err;
-    }
+  if (!selection) {
+    db.get('SELECT credit_id, current_amount FROM credits WHERE debtor = ? AND date = ? AND initial_amount = ?', [debtor, dateCreated, initAmount], (err, row) => {
 
-    const credit_id = row.credit_id;
-    const current = row.current_amount;
-    const remaining = current - payment;
-
-    db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [credit_id, date, payment, debtor, details], (err) => {
       if (err) {
-        console.error(err.message);
-        res.status(500).send('Error updating data in payments_received table.');
-        } else {
-        res.status(200);
-        console.log('Data updated successfully in payments_received table.');
-        // res.redirect('/paymentreceived');
-        }
+        throw err;
+      }
+  
+      const credit_id = row.credit_id;
+      const current = row.current_amount;
+      const remaining = current - payment;
+  
+      db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [credit_id, date, payment, debtor, details], (err) => {
+        if (err) {
+          console.error(err.message);
+          res.status(500).send('Error updating data in payments_received table.');
+          } else {
+          res.status(200);
+          console.log('Data updated successfully in payments_received table.');
+          // res.redirect('/paymentreceived');
+          }
+      })
+  
+      db.run('UPDATE credits SET current_amount = ? WHERE credit_id = ?',[remaining, credit_id], (err) =>{
+        if (err) {
+          console.error(err.message);
+          res.status(500).send('Error updating current_amount in credits table.');
+          } else {
+          res.status(200);
+          console.log('current_amount updated successfully in credits table.');
+          res.redirect('/paymentreceived');
+          }
+      })
     })
-
-    db.run('UPDATE credits SET current_amount = ?',[remaining], (err) =>{
+  }
+  else {
+    db.all('SELECT date FROM credits WHERE debtor = ? AND user_id = ?', [selection, req.session.user_id], (err, rows) => {
       if (err) {
-        console.error(err.message);
-        res.status(500).send('Error updating current_amount in credits table.');
-        } else {
-        res.status(200);
-        console.log('current_amount updated successfully in credits table.');
-        res.redirect('/paymentreceived');
-        }
+        throw err;
+      }
+
+      const datesDebtor = rows.map(row => ({date: row.date}));
+
+      res.json({
+        status: 'success',
+        body: datesDebtor
+      });
+
     })
-  })
+  }
+
 })
 
 //Post method used to sign up users

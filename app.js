@@ -121,7 +121,7 @@ app.get('/newcredits', (req, res) => {
         throw err;
       }
       const lines = rows.map(row => ({category: row.category}));
-      db.all('SELECT * from credits WHERE user_id =?', [req.session.user_id], (err, rows) => {
+      db.all('SELECT * from credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
         if (err) {
           throw err;
         }

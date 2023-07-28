@@ -51,11 +51,11 @@
     <tbody id="js-tbl-credits" class="table-group-divider">
     {% for c in creditLines %}
       <tr>
-        <td scope="col" class="text-center">1</td>
+        <td scope="col" class="text-center">{{loop.index}}</td>
         <td scope="col" class="text-center">{{c.category}}</td>
-        <td scope="col" class="text-center">{{c.date}}</td>
-        <td scope="col" class="text-center">{{c.iamount}}</td>
-        <td scope="col" class="text-center">{{c.camount}}</td>
+        <td scope="col" class="text-center js-credit-date">{{c.date}}</td>
+        <td scope="col" class="text-center js-credit-amount">{{c.iamount}}</td>
+        <td scope="col" class="text-center js-credit-amount">{{c.camount}}</td>
         <td scope="col" class="text-center">{{c.debtor}}</td>
         <td scope="col" class="text-center">{{c.description}}</td>
       </tr>

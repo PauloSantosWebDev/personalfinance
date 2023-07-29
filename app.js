@@ -41,14 +41,14 @@ app.use(sessions({
 // db.run('DROP TABLE credits');
 // db.run('DROP TABLE payments_received');
 // db.run('DROP TABLE interests_received');
-// db.all('SELECT * FROM payments_received', (err, rows) => {
-//   if (err) {
-//     throw err;
-//   }
-//   rows.forEach(row => {
-//     console.log(row);
-//   })
-// })
+db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id ORDER BY payments_received.credit_id', (err, rows) => {
+  if (err) {
+    throw err;
+  }
+  rows.forEach(row => {
+    console.log(row);
+  })
+})
 // 
 // db.all('SELECT * FROM credits', (err, rows) => {
 //   if (err) {
@@ -144,7 +144,7 @@ app.get('/paymentreceived', (req, res) => {
     //     throw err;
     //   }
       // const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
-      db.all('SELECT * from credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
+      db.all('SELECT * FROM credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
         if (err) {
           throw err;
         }
@@ -159,6 +159,42 @@ app.get('/paymentreceived', (req, res) => {
   }
 })
 
+//Payment received page
+app.get('/paymenthistory', (req, res) => {
+  if (req.session.user_id) {
+    db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id WHERE user_id = ? ORDER BY payments_received.credit_id', [req.session.user_id], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+
+      const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.date, amount: row.amount, description: row.detail}));
+      console.log(paymentLines);
+      res.render('paymenthistory.njk', {title:'History of payments', paymentLines});
+
+    })
+    
+    // db.all('SELECT credit_id FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
+    //   if(err) {
+    //     throw err;
+    //   }
+    //   // const creditId = rows.map(row => ({creditId: row.credit_id}));
+    //   const creditId = rows.map(row => (row.credit_id)).join(',');
+    //   console.log(creditId);
+    //   db.all('SELECT * FROM payments_received WHERE credit_id IN (?) GROUP BY credit_id ORDER BY credit_id', [creditId], (err, rows) => {
+    //     if (err) {
+    //       throw err;
+    //     }
+    //     const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.date, amount: row.amount, description: row.detail}));
+    //     console.log(paymentLines);
+    //     res.render('paymenthistory.njk', {title:'History of payments', paymentLines});
+    //   }) 
+    // })
+
+  }
+  else {
+    res.redirect('/signin');
+  }
+})
 
 //------------------------------------------------------------------
 //Post methods

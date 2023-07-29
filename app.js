@@ -148,7 +148,7 @@ app.get('/paymentreceived', (req, res) => {
         if (err) {
           throw err;
         }
-        const creditLines = rows.map(row => ({category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
+        const creditLines = rows.map(row => ({creditId: row.credit_id, category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
         res.render('paymentreceived.njk', {title:'Payments received', creditLines});
       }) 
       // res.render('paymentreceived.njk', {title: 'Payments received', lines});
@@ -227,66 +227,47 @@ app.post('/newcredits', (req, res) => {
 
 //Post method to populate payments_received table and update credits table
 app.post('/paymentreceived', (req, res) => {
-  const debtor = req.body.inputDebtor;
-  const dateCreated = req.body.inputDateCreated;
-  const initAmount = req.body.inputInitialAmount;
+  const creditId = req.body.inputCreditID;
+  // const dateCreated = req.body.inputDateCreated;
+  // const initAmount = req.body.inputInitialAmount;
   const date = req.body.inputPaymentDate;
   const payment = req.body.inputPayment;
   const details = req.body.inputDescription;
-  const selection = req.body.selection;
 
-  console.log(selection);
+  db.get('SELECT debtor, current_amount FROM credits WHERE credit_id = ?', [creditId], (err, row) => {
 
-  if (!selection) {
-    db.get('SELECT credit_id, current_amount FROM credits WHERE debtor = ? AND date = ? AND initial_amount = ?', [debtor, dateCreated, initAmount], (err, row) => {
+    if (err) {
+      throw err;
+    }
 
+    // const credit_id = row.credit_id;
+    const debtor = row.debtor;
+    const current = row.current_amount;
+    const remaining = current - payment;
+
+    db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [creditId, date, payment, debtor, details], (err) => {
       if (err) {
-        throw err;
+        console.error(err.message);
+        res.status(500).send('Error updating data in payments_received table.');
+      } 
+      else {
+        res.status(200);
+        console.log('Data updated successfully in payments_received table.');
+        // res.redirect('/paymentreceived');
       }
-  
-      const credit_id = row.credit_id;
-      const current = row.current_amount;
-      const remaining = current - payment;
-  
-      db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [credit_id, date, payment, debtor, details], (err) => {
-        if (err) {
-          console.error(err.message);
-          res.status(500).send('Error updating data in payments_received table.');
-          } else {
-          res.status(200);
-          console.log('Data updated successfully in payments_received table.');
-          // res.redirect('/paymentreceived');
-          }
-      })
-  
-      db.run('UPDATE credits SET current_amount = ? WHERE credit_id = ?',[remaining, credit_id], (err) =>{
-        if (err) {
-          console.error(err.message);
-          res.status(500).send('Error updating current_amount in credits table.');
-          } else {
-          res.status(200);
-          console.log('current_amount updated successfully in credits table.');
-          res.redirect('/paymentreceived');
-          }
-      })
     })
-  }
-  else {
-    db.all('SELECT date FROM credits WHERE debtor = ? AND user_id = ?', [selection, req.session.user_id], (err, rows) => {
+
+    db.run('UPDATE credits SET current_amount = ? WHERE credit_id = ? AND user_id = ?',[remaining, creditId, req.session.user_id], (err) =>{
       if (err) {
-        throw err;
-      }
-
-      const datesDebtor = rows.map(row => ({date: row.date}));
-
-      res.json({
-        status: 'success',
-        body: datesDebtor
-      });
-
+        console.error(err.message);
+        res.status(500).send('Error updating current_amount in credits table.');
+        } else {
+        res.status(200);
+        console.log('current_amount updated successfully in credits table.');
+        res.redirect('/paymentreceived');
+        }
     })
-  }
-
+  })
 })
 
 //Post method used to sign up users

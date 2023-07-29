@@ -5,37 +5,37 @@
   <h2>Register new credits</h2>
   <form class="row g-3" method="post" action="/paymentreceived"> 
     <div class="col-md-4">
-      <label for="inputDebtor" class="form-label">Debtor's name</label>
-      <select id="inputDebtor" name="inputDebtor" class="form-select">
+      <label for="inputCreditID" class="form-label">Credit ID</label>
+      <select id="inputCreditID" name="inputCreditID" class="form-select">
         <option selected></option>
         {% for c in creditLines %}
-          <option>{{c.debtor}}</option>
+          <option>{{c.creditId}}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-4">
+    {# <div class="col-md-4">
       <label for="inputDateCreated" class="form-label">Date created</label>
       <select id="inputDateCreated" name="inputDateCreated" class="form-select" required>
         <option selected></option>
-        {# {% for l in lines %}
+        {% for l in lines %}
           <option>{{l.date}}</option>
-        {% endfor %} #}
+        {% endfor %}
       </select>
-    </div>
-    <div class="col-md-4">
+    </div> #}
+    {# <div class="col-md-4">
       <label for="inputInitialAmount" class="form-label">Initial amount</label>
       <select id="inputInitialAmount" name="inputInitialAmount" class="form-select" required>
         <option selected></option>
-        {# {% for l in lines %}
+        {% for l in lines %}
           <option>{{l.amount}}</option>
-        {% endfor %} #}
+        {% endfor %}
       </select>
-    </div>
-    <div class="col-md-3">
+    </div> #}
+    <div class="col-md-4">
       <label for="inputPaymentDate" class="form-label">Date</label>
       <input type="date" class="form-control" id="inputPaymentDate" name="inputPaymentDate" required>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <label for="inputPayment" class="form-label">Payment</label>
       <input type="number" min="0.00" step="0.01" class="form-control" id="inputPayment" name="inputPayment" required>
     </div>
@@ -54,6 +54,7 @@
     <thead>
       <tr>
         <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">Credit ID</th>
         <th scope="col" class="text-center">Category</th>
         <th scope="col" class="text-center">Date</th>
         <th scope="col" class="text-center">Initial Amount</th>
@@ -66,6 +67,7 @@
     {% for c in creditLines %}
       <tr>
         <td scope="col" class="text-center">{{loop.index}}</td>
+        <td scope="col" class="text-center">{{c.creditId}}</td>
         <td scope="col" class="text-center">{{c.category}}</td>
         <td scope="col" class="text-center js-credit-date">{{c.date}}</td>
         <td scope="col" class="text-center js-credit-amount">{{c.iamount}}</td>

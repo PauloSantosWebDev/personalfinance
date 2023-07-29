@@ -43,22 +43,22 @@ document.querySelectorAll('.js-credit-amount').forEach(e => {
 //------------------------------------------------------
 //Async functions
 
-async function loadDatesForDebtor () {
-  const selection = document.getElementById('inputDebtor').value;
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({selection})
-  };
+// async function loadDatesForDebtor () {
+//   const selection = document.getElementById('inputDebtor').value;
+//   const options = {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({selection})
+//   };
 
-  const response = await fetch('/paymentreceived', options);
+//   const response = await fetch('/paymentreceived', options);
   
-  const data = await response.json();
+//   const data = await response.json();
 
-  return data.body;
-};
+//   return data.body;
+// };
 
 //End of async functions
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -66,16 +66,16 @@ async function loadDatesForDebtor () {
 //------------------------------------------------------
 //Listeners
 
-document.getElementById('inputDebtor').addEventListener('change', async () => {
-  const arrayFromFunction = await loadDatesForDebtor();
-  let accumHTML = '';
+// document.getElementById('inputDebtor').addEventListener('change', async () => {
+//   const arrayFromFunction = await loadDatesForDebtor();
+//   let accumHTML = '';
 
-  arrayFromFunction.forEach((e, i) => {
-    accumHTML += `<option value="${i}">${e.date}</option>`
-  })
+//   arrayFromFunction.forEach((e, i) => {
+//     accumHTML += `<option value="${i}">${e.date}</option>`
+//   })
   
-  document.getElementById('inputDateCreated').innerHTML = accumHTML;
+//   document.getElementById('inputDateCreated').innerHTML = accumHTML;
 
-})
+// })
 
 //End of listeners

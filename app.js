@@ -41,14 +41,14 @@ app.use(sessions({
 // db.run('DROP TABLE credits');
 // db.run('DROP TABLE payments_received');
 // db.run('DROP TABLE interests_received');
-db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id ORDER BY payments_received.credit_id', (err, rows) => {
-  if (err) {
-    throw err;
-  }
-  rows.forEach(row => {
-    console.log(row);
-  })
-})
+// db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id ORDER BY payments_received.credit_id', (err, rows) => {
+//   if (err) {
+//     throw err;
+//   }
+//   rows.forEach(row => {
+//     console.log(row);
+//   })
+// })
 // 
 // db.all('SELECT * FROM credits', (err, rows) => {
 //   if (err) {
@@ -167,7 +167,7 @@ app.get('/paymenthistory', (req, res) => {
         throw err;
       }
 
-      const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.date, amount: row.amount, description: row.detail}));
+      const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.payment_date, amount: row.amount, description: row.detail}));
       console.log(paymentLines);
       res.render('paymenthistory.njk', {title:'History of payments', paymentLines});
 
@@ -281,7 +281,7 @@ app.post('/paymentreceived', (req, res) => {
     const current = row.current_amount;
     const remaining = current - payment;
 
-    db.run('INSERT INTO payments_received (credit_id, date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [creditId, date, payment, debtor, details], (err) => {
+    db.run('INSERT INTO payments_received (credit_id, payment_date, amount, payer, detail) VALUES (?, ?, ?, ?, ?)', [creditId, date, payment, debtor, details], (err) => {
       if (err) {
         console.error(err.message);
         res.status(500).send('Error updating data in payments_received table.');

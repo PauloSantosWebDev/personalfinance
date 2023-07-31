@@ -19,7 +19,7 @@ db.run('CREATE TABLE IF NOT EXISTS categories (user_id INTEGER, category_id INTE
 db.run('CREATE TABLE IF NOT EXISTS credits (user_id INTEGER, credit_id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, date TEXT NOT NULL, initial_amount REAL NOT NULL, debtor TEXT NOT NULL, description NOT NULL, current_amount REAL, FOREIGN KEY (user_id) REFERENCES users (user_id))');
 
 //All the payments toward the credits I have will be stored in the payments_received table.
-db.run('CREATE TABLE IF NOT EXISTS payments_received (credit_id INTEGER, date TEXT NOT NULL, amount REAL NOT NULL, payer TEXT NOT NULL, detail TEXT, FOREIGN KEY (credit_id) REFERENCES credits (credit_id))');
+db.run('CREATE TABLE IF NOT EXISTS payments_received (credit_id INTEGER, payment_date TEXT NOT NULL, amount REAL NOT NULL, payer TEXT NOT NULL, detail TEXT, FOREIGN KEY (credit_id) REFERENCES credits (credit_id))');
 
 //If interests apply to the credits I have to receive, they will be stored in this table
 db.run('CREATE TABLE IF NOT EXISTS interests_received (credit_id INTEGER, date TEXT NOT NULL, amount REAL NOT NULL, details TEXT NOT NULL, FOREIGN KEY (credit_id) REFERENCES credits (credit_id))');

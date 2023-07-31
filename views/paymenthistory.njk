@@ -23,13 +23,13 @@
         <td scope="col" class="text-center">{{loop.index}}</td>
         <td scope="col" class="text-center">{{p.creditId}}</td>
         <td scope="col" class="text-center">{{p.payer}}</td>
-        <td scope="col" class="text-center">{{p.amount}}</td>
-        <td scope="col" class="text-center">{{p.date}}</td>
+        <td scope="col" class="text-center js-credit-amount">{{p.amount}}</td>
+        <td scope="col" class="text-center js-credit-date">{{p.date}}</td>
         <td scope="col" class="text-center">{{p.description}}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
 
-  {# <script src="/javascripts/paymenthistory.js"></script> #}
+  <script src="/javascripts/paymenthistory.js"></script>
 {% endblock %}

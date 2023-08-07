@@ -1,0 +1,67 @@
+{% extends 'layout.njk' %}
+
+{% block content %}
+  
+  <h2>Register new debts</h2>
+  <form class="row g-3" method="post" action="/newdebts"> 
+    <div class="col-md-2">
+      <label for="inputCategory" class="form-label">Category</label>
+      <select id="inputCategory" name="inputCategory" class="form-select">
+        <option selected>Choose...</option>
+        {% for l in lines %}
+          <option>{{l.category}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="inputDateCreated" class="form-label">Date</label>
+      <input type="date" class="form-control" id="inputDateCreated" name="inputDateCreated" required>
+    </div>
+    <div class="col-md-2">
+      <label for="inputAmount" class="form-label">Amount</label>
+      <input type="number" min="0.00" step="0.01" class="form-control" id="inputAmount" name="inputAmount" required>
+    </div>
+    <div class="col-md-2">
+      <label for="inputCreditor" class="form-label">Creditor's name</label>
+      <input type="text" class="form-control" id="inputCreditor" name="inputCreditor" required>
+    </div>
+    <div class="col-md-4">
+      <label for="inputDescription" class="form-label">Description</label>
+      <input type="text" class="form-control" id="inputDescription" name="inputDescription" required>
+    </div>
+    <div class="col-4">
+      <button type="submit" class="btn btn-success">Register</button>
+    </div>
+  </form>
+
+  <h5 style="margin-top: 2em; margin-bottom: 1em;">DEBTS TABLE</h5>
+
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">Category</th>
+        <th scope="col" class="text-center">Date</th>
+        <th scope="col" class="text-center">Initial Amount</th>
+        <th scope="col" class="text-center">Current Amount</th>
+        <th scope="col" class="text-center">Creditor's name</th>
+        <th scope="col" class="text-center">Description</th>
+      </tr>
+    </thead>
+    <tbody id="js-tbl-debts" class="table-group-divider">
+    {% for d in debtLines %}
+      <tr>
+        <td scope="col" class="text-center">{{loop.index}}</td>
+        <td scope="col" class="text-center">{{d.category}}</td>
+        <td scope="col" class="text-center js-debt-date">{{d.date}}</td>
+        <td scope="col" class="text-center js-debt-amount" style="color: red;">{{d.iamount}}</td>
+        <td scope="col" class="text-center js-debt-amount" style="color: red;">{{d.camount}}</td>
+        <td scope="col" class="text-center">{{d.creditor}}</td>
+        <td scope="col" class="text-center">{{d.description}}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <script src="/javascripts/newdebts.js"></script>
+{% endblock %}

@@ -196,6 +196,45 @@ app.get('/paymenthistory', (req, res) => {
   }
 })
 
+//New debts page
+app.get('/newdebts', (req, res) => {
+  if (req.session.user_id) {
+    const debt = 'Debts';
+    db.all('SELECT category FROM categories WHERE allocation = ? AND user_id = ?', [debt, req.session.user_id], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const lines = rows.map(row => ({category: row.category}));
+      db.all('SELECT * from debts WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        const debtLines = rows.map(row => ({category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, creditor: row.creditor, description: row.description}));
+        res.render('newdebts.njk', {title:'New debts page', lines, debtLines});
+      })
+    })
+  } 
+  else {
+    res.redirect('/signin');
+  }
+})
+
+//Payment made page
+app.get('/paymentmade', (req, res) => {
+  if (req.session.user_id) {
+    db.all('SELECT * FROM debts WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const debtLines = rows.map(row => ({debtId: row.debt_id, category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, creditor: row.creditor, description: row.description}));
+      res.render('paymentmade.njk', {title:'Payments made', debtLines});
+    }) 
+  }
+  else {
+    res.redirect('/signin');
+  }
+})
+
 //------------------------------------------------------------------
 //Post methods
 //Post for the categories page
@@ -301,6 +340,68 @@ app.post('/paymentreceived', (req, res) => {
         res.status(200);
         console.log('current_amount updated successfully in credits table.');
         res.redirect('/paymentreceived');
+        }
+    })
+  })
+})
+
+//Post method to populate credits table
+app.post('/newdebts', (req, res) => {
+  const categ = req.body.inputCategory;
+  const date = req.body.inputDateCreated;
+  const amount = req.body.inputAmount;
+  const creditor = req.body.inputCreditor;
+  const description = req.body.inputDescription;
+
+  db.run('INSERT INTO debts (user_id, category, date, initial_amount, creditor, description, current_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', [req.session.user_id, categ, date, amount, creditor, description, amount], (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Error updating data in debts table.');
+      } else {
+      res.status(200);
+      console.log('Data updated successfully in debts table.');
+      res.redirect('/newdebts');
+      }
+  });
+})
+
+//Post method to populate payments_made table and update debts table
+app.post('/paymentmade', (req, res) => {
+  const debtId = req.body.inputDebtID;
+  const date = req.body.inputPaymentDate;
+  const payment = req.body.inputPayment;
+  const details = req.body.inputDescription;
+
+  db.get('SELECT creditor, current_amount FROM debts WHERE debt_id = ?', [debtId], (err, row) => {
+
+    if (err) {
+      throw err;
+    }
+
+    // const credit_id = row.credit_id;
+    const creditor = row.creditor;
+    const current = row.current_amount;
+    const remaining = current - payment;
+
+    db.run('INSERT INTO payments_made (debt_id, payment_date, amount, receiver, detail) VALUES (?, ?, ?, ?, ?)', [debtId, date, payment, creditor, details], (err) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send('Error updating data in payments_made table.');
+      } 
+      else {
+        res.status(200);
+        console.log('Data updated successfully in payments_made table.');
+      }
+    })
+
+    db.run('UPDATE debts SET current_amount = ? WHERE debt_id = ? AND user_id = ?',[remaining, debtId, req.session.user_id], (err) =>{
+      if (err) {
+        console.error(err.message);
+        res.status(500).send('Error updating current_amount in debts table.');
+        } else {
+        res.status(200);
+        console.log('current_amount updated successfully in debts table.');
+        res.redirect('/paymentmade');
         }
     })
   })

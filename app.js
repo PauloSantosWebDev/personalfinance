@@ -168,7 +168,6 @@ app.get('/paymenthistory', (req, res) => {
       }
 
       const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.payment_date, amount: row.amount, description: row.detail}));
-      console.log(paymentLines);
       res.render('paymenthistory.njk', {title:'History of payments received', paymentLines});
 
     })
@@ -204,7 +203,6 @@ app.get('/paymenthistorydebt', (req, res) => {
         throw err;
       }
       const paymentLines = rows.map(row => ({debtId: row.debt_id, receiver: row.receiver, date: row.payment_date, amount: row.amount, description: row.detail}));
-      console.log(paymentLines);
       res.render('paymenthistorydebt.njk', {title:'History of payments made', paymentLines});
 
     })
@@ -303,8 +301,6 @@ app.post('/newcredits', (req, res) => {
   const amount = req.body.inputAmount;
   const debtor = req.body.inputDebtor;
   const description = req.body.inputDescription;
-
-  console.log(req.body);
 
   db.run('INSERT INTO credits (user_id, category, date, initial_amount, debtor, description, current_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', [req.session.user_id, categ, date, amount, debtor, description, amount], (err) => {
     if (err) {
@@ -465,11 +461,8 @@ app.post('/signin', (req, res) => {
     }
 
     const hashedPassword = rows.map(row => ({id: row.user_id, password: row.password}));
-    // console.log(hashedPassword[0].password);
 
     const isMatch = await bcrypt.compare(password, hashedPassword[0].password);
-
-    console.log(isMatch);
 
     if (isMatch) {
       req.session.user_id = hashedPassword[0].id;
@@ -481,14 +474,8 @@ app.post('/signin', (req, res) => {
   })
 })
 
-
-
 //Server listening
 const server = http.createServer(app);
 server.listen('3000', (err, html) => {
     console.log('Listening on port 3000');
 })
-
-// app.listen(3000, (err, html) =>{
-//     console.log(`Working on port` + 3000);
-// })

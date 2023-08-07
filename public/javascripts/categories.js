@@ -20,14 +20,6 @@ async function deleteLine (value) {
 //------------------------------------------------------
 //Listeners
 
-// //Listening to update calls
-// document.querySelectorAll('.js-btn-update').forEach((e, i) => {
-//   e.addEventListener('click', () => {
-//     console.log('value is: ' + e.value);
-//     // updateLine();
-//   })
-// })
-
 //Listening to delete calls
 document.querySelectorAll('.js-btn-delete').forEach((e, i) => {
   e.addEventListener('click', async () => {

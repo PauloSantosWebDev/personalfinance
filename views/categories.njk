@@ -7,13 +7,9 @@
     <div class="col-md-2">
       <label for="inputAllocations" class="form-label">Allocations</label>
       <select id="inputAllocations" name="inputAllocations" class="form-select">
-        <option selected>Choose...</option>
+        <option selected></option>
         <option>Credits</option>
         <option>Debts</option>
-        <option>Expenses</option>
-        <option>Extraordinary payments</option>
-        <option>Income</option>
-        <option>Investments</option>
       </select>
     </div>
     <div class="col-md-2">
@@ -41,7 +37,6 @@
         <td>{{l.allocation}}</td>
         <td>{{l.category}}</td>
         <td>{{l.description}}</td>
-        {# <td><button class="btn btn-secondary js-btn-update" value="{{l.id}}">Update</button></td> #}
         <td><button class="btn btn-danger js-btn-delete" value="{{l.id}}">Delete</button></td>
       </tr>
     {% endfor %}

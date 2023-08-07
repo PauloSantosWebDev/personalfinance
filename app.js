@@ -159,7 +159,7 @@ app.get('/paymentreceived', (req, res) => {
   }
 })
 
-//Payment received page
+//History of payments received
 app.get('/paymenthistory', (req, res) => {
   if (req.session.user_id) {
     db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id WHERE user_id = ? ORDER BY payments_received.credit_id', [req.session.user_id], (err, rows) => {
@@ -169,7 +169,7 @@ app.get('/paymenthistory', (req, res) => {
 
       const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.payment_date, amount: row.amount, description: row.detail}));
       console.log(paymentLines);
-      res.render('paymenthistory.njk', {title:'History of payments', paymentLines});
+      res.render('paymenthistory.njk', {title:'History of payments received', paymentLines});
 
     })
     
@@ -190,6 +190,24 @@ app.get('/paymenthistory', (req, res) => {
     //   }) 
     // })
 
+  }
+  else {
+    res.redirect('/signin');
+  }
+})
+
+//History of payments made
+app.get('/paymenthistorydebt', (req, res) => {
+  if (req.session.user_id) {
+    db.all('SELECT * FROM payments_made INNER JOIN debts ON payments_made.debt_id = debts.debt_id WHERE user_id = ? ORDER BY payments_made.debt_id', [req.session.user_id], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const paymentLines = rows.map(row => ({debtId: row.debt_id, receiver: row.receiver, date: row.payment_date, amount: row.amount, description: row.detail}));
+      console.log(paymentLines);
+      res.render('paymenthistorydebt.njk', {title:'History of payments made', paymentLines});
+
+    })
   }
   else {
     res.redirect('/signin');

@@ -27,10 +27,4 @@ db.run('CREATE TABLE IF NOT EXISTS debts (user_id INTEGER, debt_id INTEGER PRIMA
 //All the payments toward the debts will be stored in the payments_made table.
 db.run('CREATE TABLE IF NOT EXISTS payments_made (debt_id INTEGER, payment_date TEXT NOT NULL, amount REAL NOT NULL, receiver TEXT NOT NULL, detail TEXT, FOREIGN KEY (debt_id) REFERENCES debts (debt_id))');
 
-//If interests apply to the credits I have to receive, they will be stored in this table
-db.run('CREATE TABLE IF NOT EXISTS interests_received (credit_id INTEGER, date TEXT NOT NULL, amount REAL NOT NULL, details TEXT NOT NULL, FOREIGN KEY (credit_id) REFERENCES credits (credit_id))');
-
-//Example of how to create a table with a foreign key
-// db.run('CREATE TABLE IF NOT EXISTS contacts (customer_id INTEGER NOT NULL, contact_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, phone_number TEXT, mobile_number TEXT, FOREIGN KEY (customer_id) REFERENCES customers(customer_id))');
-
 module.exports = db;

@@ -1,6 +1,6 @@
 # personalfinance
 Web app to help people have a better control over their finances. It focus on credits and debts.
-#### Video demo:
+#### Video demo: https://youtu.be/Z15ByaXLCbg
 #### Description:
 The main language for this project was JavaScript, it uses express.js as its framework, Nunjucks as the templating laguage, squlite3 as my SQL database engine, and Node.js to power the server side. HTML, CSS and bootstrap 5 are also an important part of the project.
 

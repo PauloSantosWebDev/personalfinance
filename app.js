@@ -37,28 +37,6 @@ app.use(sessions({
   cookie: { maxAge: 86400000 }
 }))
 
-//Used to check the database
-// db.run('DROP TABLE credits');
-// db.run('DROP TABLE payments_received');
-// db.run('DROP TABLE interests_received');
-// db.all('SELECT * FROM payments_received INNER JOIN credits ON payments_received.credit_id = credits.credit_id ORDER BY payments_received.credit_id', (err, rows) => {
-//   if (err) {
-//     throw err;
-//   }
-//   rows.forEach(row => {
-//     console.log(row);
-//   })
-// })
-// 
-// db.all('SELECT * FROM credits', (err, rows) => {
-//   if (err) {
-//     throw err;
-//   }
-//   rows.forEach(row => {
-//     console.log(row);
-//   })
-// })
-
 //Creating routes
 //Get methods
 
@@ -128,7 +106,6 @@ app.get('/newcredits', (req, res) => {
         const creditLines = rows.map(row => ({category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
         res.render('newcredits.njk', {title:'New credits page', lines, creditLines});
       })
-      // res.render('newcredits.njk', {title:'New credits page', lines});
     })
   } 
   else {
@@ -139,20 +116,13 @@ app.get('/newcredits', (req, res) => {
 //Payment received page
 app.get('/paymentreceived', (req, res) => {
   if (req.session.user_id) {
-    // db.all('SELECT * FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
-    //   if (err) {
-    //     throw err;
-    //   }
-      // const lines = rows.map(row => ({name: row.debtor, date: row.date, amount: row.initial_amount}));
-      db.all('SELECT * FROM credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
-        if (err) {
-          throw err;
-        }
-        const creditLines = rows.map(row => ({creditId: row.credit_id, category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
-        res.render('paymentreceived.njk', {title:'Payments received', creditLines});
-      }) 
-      // res.render('paymentreceived.njk', {title: 'Payments received', lines});
-    // })
+    db.all('SELECT * FROM credits WHERE user_id =? ORDER BY date', [req.session.user_id], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      const creditLines = rows.map(row => ({creditId: row.credit_id, category: row.category, date: row.date, iamount: row.initial_amount, camount: row.current_amount, debtor: row.debtor, description: row.description}));
+      res.render('paymentreceived.njk', {title:'Payments received', creditLines});
+    }) 
   }
   else {
     res.redirect('/signin');
@@ -171,24 +141,6 @@ app.get('/paymenthistory', (req, res) => {
       res.render('paymenthistory.njk', {title:'History of payments received', paymentLines});
 
     })
-    
-    // db.all('SELECT credit_id FROM credits WHERE user_id = ?', [req.session.user_id], (err, rows) => {
-    //   if(err) {
-    //     throw err;
-    //   }
-    //   // const creditId = rows.map(row => ({creditId: row.credit_id}));
-    //   const creditId = rows.map(row => (row.credit_id)).join(',');
-    //   console.log(creditId);
-    //   db.all('SELECT * FROM payments_received WHERE credit_id IN (?) GROUP BY credit_id ORDER BY credit_id', [creditId], (err, rows) => {
-    //     if (err) {
-    //       throw err;
-    //     }
-    //     const paymentLines = rows.map(row => ({creditId: row.credit_id, payer: row.payer, date: row.date, amount: row.amount, description: row.detail}));
-    //     console.log(paymentLines);
-    //     res.render('paymenthistory.njk', {title:'History of payments', paymentLines});
-    //   }) 
-    // })
-
   }
   else {
     res.redirect('/signin');
@@ -317,8 +269,6 @@ app.post('/newcredits', (req, res) => {
 //Post method to populate payments_received table and update credits table
 app.post('/paymentreceived', (req, res) => {
   const creditId = req.body.inputCreditID;
-  // const dateCreated = req.body.inputDateCreated;
-  // const initAmount = req.body.inputInitialAmount;
   const date = req.body.inputPaymentDate;
   const payment = req.body.inputPayment;
   const details = req.body.inputDescription;
@@ -444,9 +394,6 @@ app.post('/register', async (req, res) => {
       res.redirect('/signin');
     }
   })
-
-
-  // res.render("register.njk");
 })
 
 //Post method used to sign in users
